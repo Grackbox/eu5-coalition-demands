@@ -1,0 +1,246 @@
+# Coalition Demands. $TARGET$ is the country the coalition is against. Checked without the war: scope:war is not set
+# when the peace screen lists its treaties.
+
+# Checked in a country: it is in a coalition against $TARGET$
+cd_coalition_member_against = {
+	is_member_of_international_organization_of_type = { type = coalition target = $TARGET$ }
+}
+
+# A coalition against $TARGET$ has a member with its capital on continent $CONTINENT$
+cd_coalition_has_member_on = {
+	$TARGET$ = {
+		any_international_organizations_target_of = {
+			international_organization_type = international_organization_type:coalition
+			any_international_organization_member = { capital ?= { continent = continent:$CONTINENT$ } }
+		}
+	}
+}
+
+# The rest are checked in a location.
+
+# Checked in a location: the country it was taken from (var:cd_taken_from, on_action/cd_on_actions.txt; kept when
+# the land later moves within the conqueror's realm, e.g. to a vassal made from it) may take it back: a core of
+# it or, if the mod menu allows it (cdm_return_noncore_on), any land taken from it
+cd_previous_owner_may_take_back = {
+	OR = {
+		has_global_variable = cdm_return_noncore_on
+		is_core_of = var:cd_taken_from
+	}
+}
+
+# Taken from a coalition member (its core, or any land with the setting), or a core of another living member
+cd_returnable_to_member = {
+	OR = {
+		AND = {
+			exists = var:cd_taken_from
+			country_exists = var:cd_taken_from
+			NOT = { var:cd_taken_from = owner }
+			var:cd_taken_from = { cd_coalition_member_against = { TARGET = $TARGET$ } }
+			cd_previous_owner_may_take_back = yes
+		}
+		any_core_in_location = {
+			country_exists = this
+			NOT = { this = PREV.owner }
+			cd_coalition_member_against = { TARGET = $TARGET$ }
+		}
+	}
+}
+
+# Same continent as the capital of a coalition member, or bordering a member's land
+cd_in_coalition_sphere = {
+	OR = {
+		AND = {
+			continent = continent:europe
+			cd_coalition_has_member_on = { TARGET = $TARGET$ CONTINENT = europe }
+		}
+		AND = {
+			continent = continent:asia
+			cd_coalition_has_member_on = { TARGET = $TARGET$ CONTINENT = asia }
+		}
+		AND = {
+			continent = continent:africa
+			cd_coalition_has_member_on = { TARGET = $TARGET$ CONTINENT = africa }
+		}
+		AND = {
+			continent = continent:america
+			cd_coalition_has_member_on = { TARGET = $TARGET$ CONTINENT = america }
+		}
+		AND = {
+			continent = continent:oceania
+			cd_coalition_has_member_on = { TARGET = $TARGET$ CONTINENT = oceania }
+		}
+		any_neighbor_location = {
+			owner ?= { cd_coalition_member_against = { TARGET = $TARGET$ } }
+		}
+	}
+}
+
+# Taken from a country that no longer exists: its core, or any land with the setting
+cd_revivable = {
+	exists = var:cd_taken_from
+	NOT = { country_exists = var:cd_taken_from }
+	cd_previous_owner_may_take_back = yes
+	cd_in_coalition_sphere = { TARGET = $TARGET$ }
+}
+
+# Taken from a living country outside the coalition (often under a truce, so it could not join): its core, or any
+# land with the setting. Only the country it was taken from: old cores without a recent conquest don't count.
+cd_returnable_to_victim = {
+	exists = var:cd_taken_from
+	country_exists = var:cd_taken_from
+	NOT = { var:cd_taken_from = owner }
+	cd_previous_owner_may_take_back = yes
+	var:cd_taken_from = {
+		NOT = { this = $TARGET$ }
+		NOT = { is_subject_or_below_of = $TARGET$ }
+	}
+	cd_in_coalition_sphere = { TARGET = $TARGET$ }
+}
+
+# Taken recently (the mod menu's years, on_action/cd_on_actions.txt), and not yet a core of its owner unless that
+# check is off in the mod menu (cdm_return_core_off). Owned by $TARGET$ or one of its subjects.
+cd_location_returnable = {
+	has_variable = cd_recently_conquered
+	OR = {
+		has_global_variable = cdm_return_core_off
+		NOT = { is_core_of = owner }
+	}
+	OR = {
+		cd_returnable_to_member = { TARGET = $TARGET$ }
+		cd_returnable_to_victim = { TARGET = $TARGET$ }
+		cd_revivable = { TARGET = $TARGET$ }
+	}
+}
+
+# Checked in a subject of $TARGET$: $TARGET$ made it a subject recently (the mod menu's years) and the coalition
+# wants it back: to its former overlord, if it was taken from a living country in or near the coalition, else free,
+# if it lies near the coalition.
+cd_subject_returnable = {
+	is_subject_of = $TARGET$
+	has_variable = cd_subjugated_by
+	var:cd_subjugated_by = $TARGET$
+	OR = {
+		cd_subject_goes_back = { TARGET = $TARGET$ }
+		capital ?= { cd_in_coalition_sphere = { TARGET = $TARGET$ } }
+	}
+}
+
+# Checked in a subject of $TARGET$: it was taken from a living overlord in or near the coalition
+cd_subject_goes_back = {
+	has_variable = cd_former_overlord
+	exists = var:cd_former_overlord
+	var:cd_former_overlord = {
+		country_exists = this
+		NOT = { this = $TARGET$ }
+		NOT = { is_subject_or_below_of = $TARGET$ }
+		OR = {
+			cd_coalition_member_against = { TARGET = $TARGET$ }
+			capital ?= { cd_in_coalition_sphere = { TARGET = $TARGET$ } }
+		}
+	}
+}
+
+# The rules below show as one line each in the join tooltip (custom_tooltip), so the whole tree fits on screen.
+
+# Checked in a country that could join a coalition against $TARGET$. Off in the mod menu: cdm_rivals_off.
+cd_rival_of_target = {
+	custom_tooltip = {
+		text = cd_tt_rival
+		NOT = { has_global_variable = cdm_rivals_off }
+		any_rival = { this = $TARGET$ }
+	}
+}
+
+# Both are hegemons, $TARGET$ is close enough for a coalition (the AI never joins one beyond 300)
+# and not liked too much. Off in the mod menu: cdm_hegemons_off.
+cd_hegemon_near_hegemon_target = {
+	custom_tooltip = {
+		text = cd_tt_hegemon
+		NOT = { has_global_variable = cdm_hegemons_off }
+		is_hegemon = yes
+		$TARGET$ = { is_hegemon = yes }
+		"border_distance_to($TARGET$)" <= 300
+		NOT = {
+			opinion = {
+				target = $TARGET$
+				value >= 150
+			}
+		}
+	}
+}
+
+# The Emperor, against a target with an opinion below +150, when a member of the HRE is in a coalition against it.
+# Off in the mod menu: cdm_emperor_off.
+cd_emperor_for_hre_member = {
+	custom_tooltip = {
+		text = cd_tt_emperor
+		NOT = { has_global_variable = cdm_emperor_off }
+		is_leader_of_international_organization = international_organization:hre
+		NOT = {
+			opinion = {
+				target = $TARGET$
+				value >= 150
+			}
+		}
+		$TARGET$ = {
+			any_international_organizations_target_of = {
+				international_organization_type = international_organization_type:coalition
+				any_international_organization_member = {
+					is_member_of_international_organization = international_organization:hre
+				}
+			}
+		}
+	}
+}
+
+# Joins and stays in a coalition against $TARGET$ without the opinion and antagonism it otherwise needs
+cd_eager_coalition_member = {
+	OR = {
+		cd_rival_of_target = { TARGET = $TARGET$ }
+		cd_hegemon_near_hegemon_target = { TARGET = $TARGET$ }
+		cd_emperor_for_hre_member = { TARGET = $TARGET$ }
+	}
+}
+
+# Checked in a country under a truce with $TARGET$: it may join a coalition against $TARGET$, and stay in it, anyway.
+# Only for countries there for their antagonism, above the mod menu's level (default 100, twice what a coalition
+# needs); rivals and hegemons keep the truce. Off in the mod menu: cdm_truce_join_off. Three lines in the tooltip, so
+# it shows which one fails.
+cd_truce_breaker = {
+	custom_tooltip = {
+		text = cd_tt_truce_rule
+		NOT = { has_global_variable = cdm_truce_join_off }
+	}
+	custom_tooltip = {
+		text = cd_tt_truce_antagonism
+		antagonism = {
+			target = $TARGET$
+			value > cdm_truce_antagonism_value
+		}
+	}
+	custom_tooltip = {
+		text = cd_tt_truce_strength
+		cd_overwhelming_coalition_against = { TARGET = $TARGET$ }
+	}
+}
+
+# Checked anywhere: a coalition against $TARGET$ is more than the mod menu's times (default 2) as strong as it
+cd_overwhelming_coalition_against = {
+	$TARGET$ = {
+		any_international_organizations_target_of = {
+			international_organization_type = international_organization_type:coalition
+			# the army comparison of the coalition window ("total combat power")
+			organization_strength_relative_to_country = {
+				target = $TARGET$
+				value > cdm_truce_strength_value
+				exclude_target = yes
+			}
+		}
+	}
+}
+
+# Checked in a coalition member: it may lead the coalition's war (on_action/cd_on_actions.txt)
+cd_may_lead_coalition = {
+	country_exists = this # the member list can hold a country that no longer exists
+	is_subject = no # a tributary may be a member but can't lead a war
+}

@@ -1,0 +1,21 @@
+# Coalition Demands. Dropped as a bomb for each location given back, counted as if it were taken again, so it takes off
+# what the conquest added. It takes off less than the conquest gave (57-65% in testing), as the country the land was
+# taken from got +50% for being the target of the war: that part stays.
+cd_antagonism_returned_land = {
+	value = -1 #multiplied by the worth of the location
+	yearly_decay = 2
+}
+
+# Added by Dissolve Coalition to the losing coalition, scaled to 75% of their antagonism towards the winner. Decays at
+# the fastest rate conquests do (antagonism_peace_treaty_demands), so it never outlasts what it takes off.
+cd_antagonism_coalition_dissolved = {
+	value = -1
+	yearly_decay = 3
+}
+
+# Dropped as a bomb for each location of a subject set free or given back, as the game counts subjugating at half of
+# taking the land (antagonism_subjugated_nation = 0.5)
+cd_antagonism_freed_subject = {
+	value = -0.5 #multiplied by the worth of the location
+	yearly_decay = 2
+}

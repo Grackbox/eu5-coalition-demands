@@ -1,0 +1,48 @@
+[h1]Coalition Demands[/h1]
+Coalitions fight to undo your conquests: they take back the locations you seized from their members and neighbours, free your new vassals and revive the countries you destroyed. No humiliation.
+
+[h2]Who it's for[/h2]
+This mod is about player fun, not historical outcomes. It makes blobbing harder, for players and the AI alike: what you take, a coalition can take back. In return, antagonism no longer lingers almost forever: giving your conquests back, or beating a coalition, wipes most of it.
+
+[h2]Return Conquests[/h2]
+A new peace treaty for a coalition that wins its war. It costs a flat 75% war score; the AI always asks for it, and accepts it when you offer it.
+[list]
+[*]Locations you took from coalition members go back to them.
+[*]Locations you took from countries outside the coalition go back too, if they lie near it (same continent as a member's capital, or bordering a member). Coalitions often form exactly while you hold a truce with your victims, who can't join.
+[*]Countries you destroyed near the coalition rise again.
+[*]Lands you passed to your own vassals count as well, e.g. a vassal you made from conquered land.
+[*]Subjects you made recently go back to the overlord you took them from, or become independent.
+[*]Only recent conquests: 30 years by default, and not once the location has become your core.
+[*]Antagonism from those conquests is taken off: each returned location and freed subject drops the antagonism it caused (new "Returned conquered locations" and "Freed subjects" lines).
+[/list]
+
+[h2]Coalition wars[/h2]
+[list]
+[*]No Humiliation in coalition wars.
+[*]Members want their own cores back through the game's Return Core treaty, and nothing else.
+[*]The strongest member in the war leads it (the game's own country strength), whoever declared it.
+[*]Winning with Dissolve Coalition now also removes 75% of the losers' antagonism towards you.
+[/list]
+
+[h2]Who joins coalitions[/h2]
+Besides the usual countries with antagonism above 50 and opinion below -50:
+[list]
+[*]Countries that chose the coalition's target as their rival.
+[*]A hegemon against a neighbouring hegemon (borders within 300), if its opinion of it is below +150.
+[*]The Holy Roman Emperor, when a member of the Empire is in the coalition, if its opinion of the target is below +150.
+[*]Countries under a truce with the target, when their antagonism is above 100 and the coalition is more than twice as strong as the target. Rivals, hegemons and the Emperor always keep a truce.
+[/list]
+
+[h2]Settings[/h2]
+Everything above can be tuned in the [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3692202776]Community Mod Framework[/url] mod menu (required): the years a conquest can be demanded back, whether a core stops it, whether non-core locations go back too (off by default), the truce rule with its antagonism and strength thresholds, and each of the extra joining rules.
+
+[h2]Good to know[/h2]
+[list]
+[*]Can be added to a running game, but conquests made before that aren't recorded and can't be demanded back.
+[*]A change of the years setting applies to new conquests only.
+[*]Changes these game files, so mods that change the same ones may conflict: peace_treaties/humiliate.txt, peace_treaties/dissolve_coalition.txt, casus_belli/coalition.txt, international_organizations/coalition.txt, scripted_triggers/international_organization_triggers.txt.
+[*]English and Russian text.
+[/list]
+
+[h2]Check out my other mods[/h2]
+[url=https://steamcommunity.com/profiles/76561198014901870/myworkshopfiles/?appid=3450310]All my Europa Universalis V mods[/url]

@@ -1,0 +1,31 @@
+# Coalition Demands. The slider settings (scripted_effects/cdm_settings.txt), with their defaults while the Community
+# Mod Framework hasn't set them.
+
+# Years a location can be demanded back after it changes owner; set on the location then, so a change of the
+# setting applies to later conquests only
+cdm_return_years_value = {
+	value = 30
+	if = {
+		limit = { has_global_variable = cdm_return_years }
+		value = global_var:cdm_return_years
+	}
+}
+
+# Antagonism a country under a truce needs to join a coalition anyway
+cdm_truce_antagonism_value = {
+	value = 100
+	if = {
+		limit = { has_global_variable = cdm_truce_antagonism }
+		value = global_var:cdm_truce_antagonism
+	}
+}
+
+# How many times stronger than its target that coalition must be
+cdm_truce_strength_value = {
+	value = 2
+	if = {
+		limit = { has_global_variable = cdm_truce_strength }
+		value = global_var:cdm_truce_strength
+	}
+}
+

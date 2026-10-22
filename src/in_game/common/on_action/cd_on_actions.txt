@@ -1,0 +1,190 @@
+# Coalition Demands. A coalition's war is led by its strongest member in it (country_strength, the game's own measure:
+# troops, tax base, manpower), whoever declared it: set_war_leader, as the game's Demand War Leadership does. Checked
+# when the war is declared and whenever a member joins it later.
+# scope:actor declares on scope:recipient, scope:war is the war
+on_war_declared = {
+	on_actions = {
+		cd_coalition_war_leader
+	}
+}
+
+cd_coalition_war_leader = {
+	trigger = {
+		scope:war ?= { casus_belli ?= casus_belli:cb_coalition }
+	}
+	effect = {
+		scope:recipient = {
+			every_international_organizations_target_of = {
+				limit = {
+					international_organization_type = international_organization_type:coalition
+					any_international_organization_member = { this = scope:actor }
+				}
+				ordered_international_organization_member = {
+					limit = {
+						cd_may_lead_coalition = yes
+						scope:war = { is_an_attacker = PREV }
+					}
+					order_by = country_strength
+					max = 1
+					check_range_bounds = no
+					save_scope_as = cd_strongest_member
+				}
+			}
+		}
+		if = {
+			limit = {
+				exists = scope:cd_strongest_member
+				NOT = { scope:war = { attacker_leader ?= scope:cd_strongest_member } }
+			}
+			scope:cd_strongest_member = { set_war_leader = { war = scope:war } }
+		}
+	}
+}
+
+# A member stronger than the war's leader joining it later takes the lead. root = the country joining a war
+on_join_war = {
+	on_actions = {
+		cd_coalition_member_joins_war
+	}
+}
+
+cd_coalition_member_joins_war = {
+	trigger = {
+		cd_may_lead_coalition = yes
+		any_current_war = {
+			casus_belli ?= casus_belli:cb_coalition
+			is_an_attacker = root
+			NOT = { attacker_leader ?= root }
+		}
+	}
+	effect = {
+		every_current_war = {
+			limit = {
+				casus_belli ?= casus_belli:cb_coalition
+				is_an_attacker = root
+				attacker_leader ?= {
+					NOT = { this = root }
+					country_strength < root.country_strength
+				}
+			}
+			save_scope_as = cd_joined_war
+			root = { set_war_leader = { war = scope:cd_joined_war } }
+		}
+	}
+}
+
+# Lands can be demanded back for some years after they change owner (scripted_triggers/cd_triggers.txt). The years
+# are the mod menu's at the time, so a change of the setting applies to later conquests only.
+on_location_changed_owner = {
+	on_actions = {
+		cd_location_changed_owner
+	}
+}
+
+# root = the location, previous_owner = the one it changed from. A move within one realm (to a subject of the old
+# owner, e.g. a vassal made from conquered land, or back from a subject) keeps what the conquest marked: who it was
+# taken from (cd_taken_from) and when (cd_recently_conquered).
+cd_location_changed_owner = {
+	effect = {
+		if = {
+			limit = {
+				NOT = {
+					AND = {
+						exists = previous_owner
+						OR = {
+							owner ?= { is_subject_or_below_of = root.previous_owner }
+							previous_owner = { is_subject_or_below_of = root.owner }
+						}
+					}
+				}
+			}
+			set_variable = {
+				name = cd_recently_conquered
+				years = cdm_return_years_value
+			}
+			if = {
+				limit = { exists = previous_owner }
+				set_variable = {
+					name = cd_taken_from
+					value = previous_owner
+					years = cdm_return_years_value
+				}
+			}
+			else_if = {
+				limit = { has_variable = cd_taken_from }
+				remove_variable = cd_taken_from
+			}
+		}
+	}
+}
+
+# Subjects can be demanded free (or back to their former overlord) for the same years after they become subjects
+# (scripted_triggers/cd_triggers.txt, cd_subject_returnable)
+on_subject_created = {
+	on_actions = {
+		cd_subject_created
+	}
+}
+
+# root = the new subject, scope:overlord = its overlord
+cd_subject_created = {
+	effect = {
+		set_variable = {
+			name = cd_subjugated_by
+			value = scope:overlord
+			years = cdm_return_years_value
+		}
+		if = {
+			limit = { has_variable = cd_former_overlord }
+			remove_variable = cd_former_overlord
+		}
+	}
+}
+
+on_transfer_subject = {
+	on_actions = {
+		cd_subject_transferred
+	}
+}
+
+# root = the subject, scope:overlord = its new overlord, scope:former_overlord = the one it was taken from
+cd_subject_transferred = {
+	effect = {
+		set_variable = {
+			name = cd_subjugated_by
+			value = scope:overlord
+			years = cdm_return_years_value
+		}
+		set_variable = {
+			name = cd_former_overlord
+			value = scope:former_overlord
+			years = cdm_return_years_value
+		}
+	}
+}
+
+# Community Mod Framework mod menu (scripted_effects/cdm_settings.txt)
+cmf_on_mod_registration = {
+	on_actions = {
+		cdm_on_register_cmf_mod
+	}
+}
+
+cdm_on_register_cmf_mod = {
+	effect = {
+		cdm_register_cmf_mod = yes
+	}
+}
+
+# CMF calls this on the country holding the menu's values whenever a setting changes (also on a reset)
+cmf_on_callback = {
+	on_actions = {
+		cdm_on_cmf_callback
+	}
+}
+
+cdm_on_cmf_callback = {
+	effect = {
+		cdm_sync_settings = yes
+	}
+}

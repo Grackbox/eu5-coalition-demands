@@ -1,0 +1,61 @@
+# Coalition Demands. Settings in the Community Mod Framework mod menu (mod id cdm), copied into global variables that
+# the rest of the mod reads (script_values/cdm_values.txt gives each its default while CMF hasn't set it).
+# Scope: the country the CMF menu reads and writes (it calls cmf_on_callback there).
+
+# A switch that is on by default: off sets the global flag <alias>_off
+cdm_copy_switch = {
+	set_local_variable = { name = cdm_tmp_flag value = flag:$setting$ }
+	if = {
+		limit = { "variable_map(cmm|local_var:cdm_tmp_flag)" >= 1 }
+		if = {
+			limit = { has_global_variable = $alias$_off }
+			remove_global_variable = $alias$_off
+		}
+	}
+	else = {
+		set_global_variable = { name = $alias$_off value = yes }
+	}
+}
+
+# A switch that is off by default: on sets the global flag <alias>_on
+cdm_copy_switch_on = {
+	set_local_variable = { name = cdm_tmp_flag value = flag:$setting$ }
+	if = {
+		limit = { "variable_map(cmm|local_var:cdm_tmp_flag)" >= 1 }
+		set_global_variable = { name = $alias$_on value = yes }
+	}
+	else_if = {
+		limit = { has_global_variable = $alias$_on }
+		remove_global_variable = $alias$_on
+	}
+}
+
+cdm_copy_value = {
+	set_local_variable = { name = cdm_tmp_flag value = flag:$setting$ }
+	set_global_variable = { name = $alias$ value = "variable_map(cmm|local_var:cdm_tmp_flag)" }
+}
+
+cdm_sync_settings = {
+	cdm_copy_value = { setting = cdm__return_years alias = cdm_return_years }
+	cdm_copy_switch = { setting = cdm__return_core alias = cdm_return_core }
+	cdm_copy_switch_on = { setting = cdm__return_noncore alias = cdm_return_noncore }
+	cdm_copy_switch = { setting = cdm__truce_join alias = cdm_truce_join }
+	cdm_copy_value = { setting = cdm__truce_antagonism alias = cdm_truce_antagonism }
+	cdm_copy_value = { setting = cdm__truce_strength alias = cdm_truce_strength }
+	cdm_copy_switch = { setting = cdm__hegemons alias = cdm_hegemons }
+	cdm_copy_switch = { setting = cdm__rivals alias = cdm_rivals }
+	cdm_copy_switch = { setting = cdm__emperor alias = cdm_emperor }
+}
+
+cdm_register_cmf_mod = {
+	cmm_register_slider_setting = { mod_id = cdm setting_id = return_years tab_id = settings group_id = return default_value = 30 min_value = 10 max_value = 100 step_value = 5 }
+	cmm_register_bool_setting = { mod_id = cdm setting_id = return_core tab_id = settings group_id = return default_value = 1 }
+	cmm_register_bool_setting = { mod_id = cdm setting_id = return_noncore tab_id = settings group_id = return default_value = 0 }
+	cmm_register_bool_setting = { mod_id = cdm setting_id = truce_join tab_id = settings group_id = truce default_value = 1 }
+	cmm_register_slider_setting = { mod_id = cdm setting_id = truce_antagonism tab_id = settings group_id = truce default_value = 100 min_value = 50 max_value = 500 step_value = 10 }
+	cmm_register_slider_setting = { mod_id = cdm setting_id = truce_strength tab_id = settings group_id = truce default_value = 2 min_value = 0.5 max_value = 10 step_value = 0.5 }
+	cmm_register_bool_setting = { mod_id = cdm setting_id = hegemons tab_id = settings group_id = join default_value = 1 }
+	cmm_register_bool_setting = { mod_id = cdm setting_id = rivals tab_id = settings group_id = join default_value = 1 }
+	cmm_register_bool_setting = { mod_id = cdm setting_id = emperor tab_id = settings group_id = join default_value = 1 }
+	cdm_sync_settings = yes
+}

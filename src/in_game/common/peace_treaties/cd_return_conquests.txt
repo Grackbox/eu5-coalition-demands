@@ -1,0 +1,48 @@
+# Coalition Demands. The coalition wins: the loser gives back what it took from coalition members, and from dead
+# countries near the coalition, to them rather than to the war leader (like the Scaliger war demands).
+cd_return_conquests = {
+	cost = {
+		add = {
+			desc = "DIPLOREASON_BASE"
+			value = 75
+		}
+	}
+
+	potential = { # without scope:war, which the peace screen does not set
+		scope:winner = {
+			is_at_war_with = scope:loser
+			cd_coalition_member_against = { TARGET = scope:loser }
+		}
+	}
+
+	allow = {
+		scope:loser = {
+			OR = {
+				any_owned_location = { cd_location_returnable = { TARGET = scope:loser } }
+				any_subject_or_below = { any_owned_location = { cd_location_returnable = { TARGET = scope:loser } } }
+				any_subject = { cd_subject_returnable = { TARGET = scope:loser } }
+			}
+		}
+	}
+
+	effect = {
+		if = {
+			limit = { exists = scope:loser }
+			custom_tooltip = {
+				text = cd_return_conquests_tt
+				cd_return_conquests_effect = { LOSER = scope:loser }
+			}
+		}
+		else = {
+			custom_tooltip = cd_return_conquests_tt
+		}
+	}
+
+	ai_desire = {
+		add = {
+			desc = "BASE"
+			value = 10000
+		}
+	}
+	ai_force_add = yes
+}

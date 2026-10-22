@@ -1,0 +1,156 @@
+# Coalition Demands. $LOSER$ is the country the coalition is against. Gives every location of $LOSER$ and its
+# subjects that cd_location_returnable allows back: to the country it was taken from (var:cd_taken_from) if it is a
+# coalition member (its core, or any land with the setting), else to another member with a core there, else to
+# the living country outside the coalition it was taken from, else to the dead one, which brings it back.
+# Each one given back takes off the antagonism its conquest added (biases/cd_antagonism.txt). Then subjects
+# $LOSER$ made recently go back to their former overlord, or free.
+cd_return_conquests_effect = {
+	$LOSER$ = {
+		every_owned_location = {
+			limit = { cd_location_returnable = { TARGET = $LOSER$ } }
+			add_to_list = cd_returned_locations
+		}
+		# also lands it gave to its subjects, e.g. a vassal made from them
+		every_subject_or_below = {
+			every_owned_location = {
+				limit = { cd_location_returnable = { TARGET = $LOSER$ } }
+				add_to_list = cd_returned_locations
+			}
+		}
+	}
+	every_in_list = {
+		list = cd_returned_locations
+		if = {
+			limit = {
+				exists = var:cd_taken_from
+				country_exists = var:cd_taken_from
+				var:cd_taken_from = { cd_coalition_member_against = { TARGET = $LOSER$ } }
+				cd_previous_owner_may_take_back = yes
+			}
+			change_location_owner = var:cd_taken_from
+		}
+		else_if = {
+			limit = { cd_returnable_to_member = { TARGET = $LOSER$ } }
+			random_core_in_location = {
+				limit = {
+					country_exists = this
+					NOT = { this = PREV.owner }
+					cd_coalition_member_against = { TARGET = $LOSER$ }
+				}
+				save_scope_as = cd_new_owner
+			}
+			change_location_owner = scope:cd_new_owner
+		}
+		else = {
+			# a living country outside the coalition, or a dead one, which this brings back
+			change_location_owner = var:cd_taken_from
+		}
+		# the on_action marked it as taken from $LOSER$ or its subject: the return isn't a conquest
+		if = {
+			limit = { has_variable = cd_recently_conquered }
+			remove_variable = cd_recently_conquered
+		}
+		if = {
+			limit = { has_variable = cd_taken_from }
+			remove_variable = cd_taken_from
+		}
+		# Take off the antagonism its conquest added: after the transfer, so it counts as taking it again
+		save_scope_as = cd_returned_location
+		$LOSER$ = {
+			drop_antagonism_bomb = {
+				target = scope:cd_returned_location
+				modifier = cd_antagonism_returned_land
+				is_taking_value = yes
+			}
+		}
+	}
+	$LOSER$ = {
+		# Subjects made recently go back to their former overlord, or free (cd_subject_returnable)
+		every_subject = {
+			limit = { cd_subject_returnable = { TARGET = $LOSER$ } }
+			add_to_list = cd_returned_subjects
+		}
+	}
+	every_in_list = {
+		list = cd_returned_subjects
+		limit = { is_subject_of = $LOSER$ }
+		save_scope_as = cd_returned_subject
+		if = {
+			limit = { cd_subject_goes_back = { TARGET = $LOSER$ } }
+			subject_type = { save_scope_as = cd_returned_subject_type }
+			var:cd_former_overlord = { save_scope_as = cd_former_overlord }
+			$LOSER$ = { cancel_subject = scope:cd_returned_subject }
+			make_subject_of = {
+				target = scope:cd_former_overlord
+				type = scope:cd_returned_subject_type
+			}
+		}
+		else = {
+			$LOSER$ = { cancel_subject = scope:cd_returned_subject }
+		}
+		# the on_actions just marked it again: this is not a new subjugation
+		if = {
+			limit = { has_variable = cd_subjugated_by }
+			remove_variable = cd_subjugated_by
+		}
+		if = {
+			limit = { has_variable = cd_former_overlord }
+			remove_variable = cd_former_overlord
+		}
+		# Take off the antagonism the subjugation added, as for locations given back
+		every_owned_location = {
+			save_scope_as = cd_returned_location
+			$LOSER$ = {
+				drop_antagonism_bomb = {
+					target = scope:cd_returned_location
+					modifier = cd_antagonism_freed_subject
+					is_taking_value = yes
+				}
+			}
+		}
+	}
+}
+
+# Dissolve Coalition won by scope:winner: its coalition's members and everyone who fought on their side drop 75% of
+# their antagonism towards scope:winner
+cd_dissolve_coalition_antagonism_effect = {
+	custom_tooltip = {
+		text = cd_dissolve_coalition_antagonism_tt
+		scope:winner = {
+			every_international_organizations_target_of = {
+				limit = { international_organization_type = international_organization_type:coalition }
+				every_international_organization_member = { add_to_list = cd_dissolved_coalition }
+			}
+		}
+		scope:war ?= {
+			if = {
+				limit = { is_an_attacker = scope:winner }
+				every_defender = {
+					limit = { NOT = { is_in_list = cd_dissolved_coalition } }
+					add_to_list = cd_dissolved_coalition
+				}
+			}
+			else = {
+				every_attacker = {
+					limit = { NOT = { is_in_list = cd_dissolved_coalition } }
+					add_to_list = cd_dissolved_coalition
+				}
+			}
+		}
+		every_in_list = {
+			list = cd_dissolved_coalition
+			add_antagonism = {
+				modifier = cd_antagonism_coalition_dissolved
+				target = scope:winner
+				scale = {
+					value = 0
+					scope:winner = { add = prev_antagonism_towards_this }
+					multiply = 0.75
+					min = 0
+				}
+			}
+		}
+	}
+}
+
+
