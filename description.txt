@@ -27,14 +27,14 @@ A new peace treaty for a coalition that wins its war. It costs a flat 75% war sc
 [h2]Who joins coalitions[/h2]
 Besides the usual countries with antagonism above 50 and opinion below -50:
 [list]
-[*]Countries that chose the coalition's target as their rival.
+[*]Countries that chose the coalition's target as their rival. Optionally, only once the coalition is strong enough.
 [*]A hegemon against a neighbouring hegemon (borders within 300), if its opinion of it is below +150.
 [*]The Holy Roman Emperor, when a member of the Empire is in the coalition, if its opinion of the target is below +150.
 [*]Countries under a truce with the target, when their antagonism is above 100 and the coalition is more than twice as strong as the target. Rivals, hegemons and the Emperor always keep a truce.
 [/list]
 
 [h2]Settings[/h2]
-Everything above can be tuned in the [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3692202776]Community Mod Framework[/url] mod menu (required): the years a conquest can be demanded back, whether a core stops it, whether non-core locations go back too (off by default), the truce rule with its antagonism and strength thresholds, and each of the extra joining rules.
+Everything above can be tuned in the [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3692202776]Community Mod Framework[/url] mod menu (required): the years a conquest can be demanded back, whether a core stops it, whether non-core locations go back too (off by default), the truce rule with its antagonism and strength thresholds, each of the extra joining rules, and an optional minimum coalition strength for rivals (off by default).
 
 [h2]Good to know[/h2]
 [list]

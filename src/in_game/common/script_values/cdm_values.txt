@@ -29,3 +29,12 @@ cdm_truce_strength_value = {
 	}
 }
 
+
+# How many times stronger than its target a coalition must be for rivals to join it, when that check is on
+cdm_rival_strength_value = {
+	value = 1
+	if = {
+		limit = { has_global_variable = cdm_rival_strength }
+		value = global_var:cdm_rival_strength
+	}
+}

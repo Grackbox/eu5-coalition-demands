@@ -149,6 +149,14 @@ cd_rival_of_target = {
 		NOT = { has_global_variable = cdm_rivals_off }
 		any_rival = { this = $TARGET$ }
 	}
+	# Optional in the mod menu (cdm_rival_strength_check_on): only into a coalition strong enough
+	trigger_if = {
+		limit = { has_global_variable = cdm_rival_strength_check_on }
+		custom_tooltip = {
+			text = cd_tt_rival_strength
+			cd_coalition_stronger_than = { TARGET = $TARGET$ TIMES = cdm_rival_strength_value }
+		}
+	}
 }
 
 # Both are hegemons, $TARGET$ is close enough for a coalition (the AI never joins one beyond 300)
@@ -224,15 +232,20 @@ cd_truce_breaker = {
 	}
 }
 
-# Checked anywhere: a coalition against $TARGET$ is more than the mod menu's times (default 2) as strong as it
+# Checked anywhere: a coalition against $TARGET$ is more than the truce setting's times (default 2) as strong as it
 cd_overwhelming_coalition_against = {
+	cd_coalition_stronger_than = { TARGET = $TARGET$ TIMES = cdm_truce_strength_value }
+}
+
+# Checked anywhere: a coalition against $TARGET$ is more than $TIMES$ (a script value) times as strong as it, by the
+# army comparison of the coalition window ("total combat power")
+cd_coalition_stronger_than = {
 	$TARGET$ = {
 		any_international_organizations_target_of = {
 			international_organization_type = international_organization_type:coalition
-			# the army comparison of the coalition window ("total combat power")
 			organization_strength_relative_to_country = {
 				target = $TARGET$
-				value > cdm_truce_strength_value
+				value > $TIMES$
 				exclude_target = yes
 			}
 		}

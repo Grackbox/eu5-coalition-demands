@@ -1,0 +1,8 @@
+# Coalition Demands. Scope: country (CMF's home country). CMF reads is_valid from <mod>__<setting>_on_changed: the
+# rivals' strength slider is greyed out while its check is off.
+cdm__rival_strength_on_changed = {
+	scope = country
+	is_valid = {
+		has_global_variable = cdm_rival_strength_check_on
+	}
+}

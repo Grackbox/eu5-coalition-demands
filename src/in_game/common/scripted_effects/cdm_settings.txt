@@ -44,6 +44,8 @@ cdm_sync_settings = {
 	cdm_copy_value = { setting = cdm__truce_strength alias = cdm_truce_strength }
 	cdm_copy_switch = { setting = cdm__hegemons alias = cdm_hegemons }
 	cdm_copy_switch = { setting = cdm__rivals alias = cdm_rivals }
+	cdm_copy_switch_on = { setting = cdm__rival_strength_check alias = cdm_rival_strength_check }
+	cdm_copy_value = { setting = cdm__rival_strength alias = cdm_rival_strength }
 	cdm_copy_switch = { setting = cdm__emperor alias = cdm_emperor }
 }
 
@@ -56,6 +58,9 @@ cdm_register_cmf_mod = {
 	cmm_register_slider_setting = { mod_id = cdm setting_id = truce_strength tab_id = settings group_id = truce default_value = 2 min_value = 0.5 max_value = 10 step_value = 0.5 }
 	cmm_register_bool_setting = { mod_id = cdm setting_id = hegemons tab_id = settings group_id = join default_value = 1 }
 	cmm_register_bool_setting = { mod_id = cdm setting_id = rivals tab_id = settings group_id = join default_value = 1 }
+	cmm_register_bool_setting = { mod_id = cdm setting_id = rival_strength_check tab_id = settings group_id = join default_value = 0 }
+	cmm_register_slider_setting = { mod_id = cdm setting_id = rival_strength tab_id = settings group_id = join default_value = 1 min_value = 0.5 max_value = 10 step_value = 0.5 }
+	cmm_add_scripted_gui = { mod_id = cdm setting_id = rival_strength }
 	cmm_register_bool_setting = { mod_id = cdm setting_id = emperor tab_id = settings group_id = join default_value = 1 }
 	cdm_sync_settings = yes
 }
