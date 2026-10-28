@@ -261,7 +261,7 @@ def main():
         lines = dict(LOC.get(lang, LOC["english"]), **COMMON)
         write(f"main_menu/localization/{lang}/cd_l_{lang}.yml",
               f"l_{lang}:\n" + "".join(f' {k}: "{v}"\n' for k, v in lines.items()))
-    meta = {"name": "Coalition Demands [LOCAL]", "id": "grackbox.coalition_demands", "version": "0.1.0", "game_id": "eu5",
+    meta = {"name": "Coalition Demands [LOCAL]", "id": "grackbox.coalition_demands", "version": "0.1.1", "game_id": "eu5",
             "supported_game_version": "1.4.*",
             "short_description": "Coalitions take back the locations you conquered from their members instead of humiliating you.",
             "tags": ["Diplomacy", "1.4"],
